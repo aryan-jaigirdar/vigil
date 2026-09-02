@@ -1,0 +1,50 @@
+{
+  "name": "vigil",
+  "version": "0.1.0",
+  "description": "Self-hosted synthetic uptime monitor with HTTP, TCP, and DNS checks, webhook alerts, and a built-in status page",
+  "keywords": [
+    "uptime",
+    "monitoring",
+    "status-page",
+    "synthetic-monitoring",
+    "healthcheck",
+    "probe",
+    "sqlite",
+    "self-hosted"
+  ],
+  "author": "Aryan Jaigirdar <jaigirdar.aryan@gmail.com>",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "bin": {
+    "vigil": "dist/cli.js"
+  },
+  "main": "dist/cli.js",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "dev": "tsx src/cli.ts run --config vigil.yaml",
+    "start": "node dist/cli.js run --config vigil.yaml"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.10.0",
+    "express": "^4.21.2",
+    "js-yaml": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/express": "^4.17.23",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20.19.0",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  }
+}

@@ -1,0 +1,43 @@
+# vigil example configuration
+# Schema reference: README.md, section "Configuration"
+
+# Port for the status dashboard and JSON API (default 3080).
+port: 3080
+
+# SQLite database file, relative to the working directory (default vigil.db).
+database: vigil.db
+
+# How long to keep raw check results (default 7 days).
+retention_days: 7
+
+# Consecutive failures required before a check is considered down (default 2).
+failure_threshold: 2
+
+# Webhooks receive a JSON POST on every up/down transition.
+# See README.md, section "Alert webhooks", for the payload shape.
+# webhooks:
+#   - https://hooks.example.com/vigil
+
+checks:
+  # HTTP check: request the URL, expect a 2xx or 3xx status by default,
+  # and require a keyword in the response body.
+  - name: example-homepage
+    type: http
+    url: https://example.com
+    keyword: Example Domain
+    interval: 60
+    timeout: 5000
+
+  # TCP check: succeed if a TCP connection to host:port can be established.
+  - name: cloudflare-dns-tcp
+    type: tcp
+    host: 1.1.1.1
+    port: 53
+    interval: 120
+
+  # DNS check: succeed if the hostname resolves to at least one address.
+  # Add expected_ip to require a specific address in the answer.
+  - name: github-dns
+    type: dns
+    hostname: github.com
+    interval: 300
