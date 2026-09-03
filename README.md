@@ -31,6 +31,17 @@ Open http://localhost:3080 for the dashboard. The JSON API lives at `/api/status
 
 During development, `npm run dev` runs the CLI straight from the TypeScript sources.
 
+### Docker
+
+The repository ships a multi-stage Dockerfile that compiles the TypeScript and runs the compiled CLI against the bundled example config.
+
+```bash
+docker build -t vigil .
+docker run -p 3080:3080 vigil
+```
+
+The container starts `vigil run --config vigil.yaml`. Mount your own config at `/app/vigil.yaml` to override the example, and mount a volume at `/app` if you want the SQLite history to survive a restart.
+
 ## Configuration
 
 Checks live in a YAML file, `vigil.yaml` by default. The repository root contains a commented example. Unknown keys are rejected, so typos fail fast at startup instead of silently doing nothing.
