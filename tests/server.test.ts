@@ -16,6 +16,7 @@ const checks: Check[] = [
     method: 'GET',
     expectStatus: null,
     keyword: null,
+    headers: {},
   },
   { name: 'db', type: 'tcp', intervalSeconds: 30, timeoutMs: 5000, host: 'db', port: 5432 },
 ];

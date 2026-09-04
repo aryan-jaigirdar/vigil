@@ -32,7 +32,7 @@ export async function httpProbe(check: HttpCheck): Promise<ProbeResult> {
       method: check.method,
       redirect: check.expectStatus === null ? 'follow' : 'manual',
       signal: controller.signal,
-      headers: { 'user-agent': 'vigil-probe' },
+      headers: { 'user-agent': 'vigil-probe', ...check.headers },
     });
     const latencyMs = Math.round(performance.now() - start);
 

@@ -74,6 +74,19 @@ Checks live in a YAML file, `vigil.yaml` by default. The repository root contain
 | `method` | string | `GET` | One of GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS. |
 | `expect_status` | integer | none | Exact status code required. Without it, any 2xx or 3xx passes. Redirects are followed by default, but when `expect_status` is set the first response is judged as-is, so you can assert on a 301 or 302. |
 | `keyword` | string | none | Substring the response body must contain. |
+| `headers` | map of string to string | none | Extra request headers sent with the probe, for example an API token or an environment selector. Each value must be a string. |
+
+Example of an http check with custom headers:
+
+```yaml
+checks:
+  - name: authed-endpoint
+    type: http
+    url: https://example.com/api
+    headers:
+      Authorization: Bearer token123
+      X-Env: staging
+```
 
 ### `tcp` checks
 

@@ -7,6 +7,7 @@ import type { HttpCheck, TcpCheck } from '../src/types.js';
 let server: http.Server;
 let port: number;
 let closedPort: number;
+let lastHeaders: http.IncomingHttpHeaders | null = null;
 
 function httpCheck(overrides: Partial<HttpCheck> & { url: string }): HttpCheck {
   return {
@@ -17,6 +18,7 @@ function httpCheck(overrides: Partial<HttpCheck> & { url: string }): HttpCheck {
     method: 'GET',
     expectStatus: null,
     keyword: null,
+    headers: {},
     ...overrides,
   };
 }
@@ -37,6 +39,11 @@ beforeAll(async () => {
   server = http.createServer((req, res) => {
     switch (req.url) {
       case '/ok':
+        res.writeHead(200, { 'content-type': 'text/plain' });
+        res.end('service is healthy');
+        break;
+      case '/headers':
+        lastHeaders = req.headers;
         res.writeHead(200, { 'content-type': 'text/plain' });
         res.end('service is healthy');
         break;
@@ -136,6 +143,18 @@ describe('httpProbe', () => {
     const result = await httpProbe(httpCheck({ url: `http://127.0.0.1:${closedPort}/ok` }));
     expect(result.ok).toBe(false);
     expect(result.error).toBeTruthy();
+  });
+
+  it('sends configured custom headers on the request', async () => {
+    const result = await httpProbe(
+      httpCheck({
+        url: `http://127.0.0.1:${port}/headers`,
+        headers: { Authorization: 'Bearer token123', 'X-Env': 'staging' },
+      }),
+    );
+    expect(result.ok).toBe(true);
+    expect(lastHeaders?.['authorization']).toBe('Bearer token123');
+    expect(lastHeaders?.['x-env']).toBe('staging');
   });
 });
 

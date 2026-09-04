@@ -26,6 +26,8 @@ export interface HttpCheck extends CheckBase {
   expectStatus: number | null;
   /** Substring the response body must contain. Null disables the body check. */
   keyword: string | null;
+  /** Extra request headers sent with the probe. Empty when none are configured. */
+  headers: Record<string, string>;
 }
 
 export interface TcpCheck extends CheckBase {

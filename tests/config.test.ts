@@ -85,6 +85,27 @@ checks:
     expect(dns.expectedIp).toBe('93.184.216.34');
   });
 
+  it('defaults headers to an empty map when omitted', () => {
+    const check = parseConfig(MINIMAL).checks[0];
+    if (check?.type !== 'http') throw new Error('expected http check');
+    expect(check.headers).toEqual({});
+  });
+
+  it('parses a headers map on an http check', () => {
+    const config = parseConfig(`
+checks:
+  - name: authed
+    type: http
+    url: https://api.example.com
+    headers:
+      Authorization: Bearer token123
+      X-Env: staging
+`);
+    const check = config.checks[0];
+    if (check?.type !== 'http') throw new Error('expected http check');
+    expect(check.headers).toEqual({ Authorization: 'Bearer token123', 'X-Env': 'staging' });
+  });
+
   it.each([
     ['not YAML mapping', 'just a string', /top level/],
     ['missing checks', 'port: 3080', /checks must be a non-empty list/],
@@ -112,6 +133,26 @@ checks:
       'http with bad expect_status',
       'checks:\n  - name: a\n    type: http\n    url: https://x.dev\n    expect_status: 99',
       /expect_status must be between 100 and 599/,
+    ],
+    [
+      'http headers that are not a mapping',
+      'checks:\n  - name: a\n    type: http\n    url: https://x.dev\n    headers: nope',
+      /headers must be a mapping/,
+    ],
+    [
+      'http header with a non-string value',
+      'checks:\n  - name: a\n    type: http\n    url: https://x.dev\n    headers:\n      X-Count: 5',
+      /headers\."X-Count" must be a string/,
+    ],
+    [
+      'headers on a tcp check',
+      'checks:\n  - name: a\n    type: tcp\n    host: h\n    port: 1\n    headers:\n      X-Env: staging',
+      /unknown key "headers"/,
+    ],
+    [
+      'headers on a dns check',
+      'checks:\n  - name: a\n    type: dns\n    hostname: x.dev\n    headers:\n      X-Env: staging',
+      /unknown key "headers"/,
     ],
     ['tcp without port', 'checks:\n  - name: a\n    type: tcp\n    host: h', /checks\[0\].port/],
     [

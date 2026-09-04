@@ -40,7 +40,7 @@ const TOP_LEVEL_KEYS = new Set([
 ]);
 
 const CHECK_KEYS: Record<CheckType, Set<string>> = {
-  http: new Set(['name', 'type', 'interval', 'timeout', 'url', 'method', 'expect_status', 'keyword']),
+  http: new Set(['name', 'type', 'interval', 'timeout', 'url', 'method', 'expect_status', 'keyword', 'headers']),
   tcp: new Set(['name', 'type', 'interval', 'timeout', 'host', 'port']),
   dns: new Set(['name', 'type', 'interval', 'timeout', 'hostname', 'expected_ip']),
 };
@@ -94,6 +94,24 @@ function optionalInteger(
 ): number {
   if (value === undefined || value === null) return fallback;
   return requireInteger(value, where, min, max);
+}
+
+function parseHeaders(value: unknown, where: string): Record<string, string> {
+  if (value === undefined || value === null) return {};
+  if (!isRecord(value)) {
+    fail(`${where} must be a mapping of header names to string values`);
+  }
+  const headers: Record<string, string> = {};
+  for (const [key, raw] of Object.entries(value)) {
+    if (typeof key !== 'string' || key.trim() === '') {
+      fail(`${where} has an empty header name`);
+    }
+    if (typeof raw !== 'string') {
+      fail(`${where}."${key}" must be a string`);
+    }
+    headers[key] = raw;
+  }
+  return headers;
 }
 
 function requireHttpUrl(value: unknown, where: string): string {
@@ -153,6 +171,7 @@ function parseCheck(value: unknown, index: number): Check {
         method,
         expectStatus,
         keyword: optionalString(value['keyword'], `${where}.keyword`),
+        headers: parseHeaders(value['headers'], `${where}.headers`),
       };
       return check;
     }
